@@ -1,0 +1,9 @@
+uvicorn
+fastapi
+sqlalchemy
+pydantic
+psycopg2-binary
+email-validator
+python-jose
+passlib
+python-multipart
