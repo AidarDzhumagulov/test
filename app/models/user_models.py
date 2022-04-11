@@ -55,7 +55,7 @@ class Email(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     user_id = Column(Integer, ForeignKey("users.id"))
-    type_of_email = Column(Enum("mobile", "work", name=EmailType), default="work")
+    type_of_email = Column(Enum("private", "work", name=EmailType), default="work")
     email = Column(String, default=EmailType.WORK, unique=True)
 
     user = relationship("User", backref="emails")

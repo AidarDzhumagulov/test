@@ -29,3 +29,13 @@ async def update_phone_user(db: Session, phone: PhoneUpdate, phone_id: int):
     db.add(db_phone)
     db.commit()
     return db_phone
+
+
+async def delete_phone_by_id(db: Session, phone_id: int):
+    try:
+        db_user = db.query(user_models.Phone).filter(user_models.Phone.id == phone_id).first()
+        db.delete(db_user)
+        db.commit()
+        return True
+    except:
+        return False

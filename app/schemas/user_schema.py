@@ -24,18 +24,22 @@ class Phone(BaseModel):
         orm_mode = True
 
 
-class EmailBase(BaseModel):
+class EmailCreate(BaseModel):
     type_of_email: str
     email: EmailStr
 
 
-class EmailCreate(EmailBase):
-    pass
+class EmailUpdate(BaseModel):
+    user_id: int
+    type_of_email: str
+    email: EmailStr
 
 
-class Email(EmailBase):
+class Email(BaseModel):
     id: int
     user_id: int
+    type_of_email: str
+    email: EmailStr
 
     class Config:
         orm_mode = True
