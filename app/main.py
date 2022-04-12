@@ -22,7 +22,9 @@ async def startup_event():
         await conn.run_sync(Base.metadata.create_all)
 
 
-
+@app.get("/")
+def healthcheck():
+    return {"message": "success"}
 
 # For debugging
 # if __name__ == "__main__":

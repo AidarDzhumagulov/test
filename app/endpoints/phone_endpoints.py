@@ -8,9 +8,9 @@ router = APIRouter()
 
 
 @router.get("/{phone_id}", tags=['Phone'], response_model=Phone)
-async def get_user_phone(phone_id: int, db: PhoneCrud = Depends()):
+async def get_user_phone(phone_id: int, phone_crud: PhoneCrud = Depends()):
     async with DbSession() as db:
-        db_phone = await PhoneCrud.get_phone_by_id(db=db, phone_id=phone_id)
+        db_phone = await phone_crud.get_phone_by_id(db, phone_id)
     return db_phone
 
 
@@ -27,7 +27,7 @@ async def update_phone_for_user(phone_id: int, phone: PhoneUpdate, phone_crud: P
         return update_phone
 
 
-@router.delete("/{phone_id}", tags=["Phone"], response_model=str)
+@router.delete("/{phone_id}", tags=['Phone'], response_model=str)
 async def delete_phone_by_(phone_id: int, phone_crud: PhoneCrud = Depends()):
     async with DbSession() as db:
         result = await phone_crud.delete_phone_by_id(db=db, phone_id=phone_id)

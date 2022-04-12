@@ -7,11 +7,6 @@ from schemas.user_schema import UserCreate, UserUpdate, UserBase
 router = APIRouter()
 
 
-@router.get("/")
-def healthcheck():
-    return {"message": "success"}
-
-
 @router.get("/{username}", tags=['User'], response_model=UserBase)
 async def get_user(username: str, user_crud: UserCrud = Depends()):
     async with DbSession() as db:
