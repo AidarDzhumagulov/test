@@ -3,6 +3,7 @@ from sqlalchemy.future import select
 from models import phone_models
 from schemas.phone_schema import PhoneCreate, PhoneUpdate
 
+
 class PhoneCrud:
     """User's Phone CRUD"""
     # To get user's phone by id from DB

@@ -13,20 +13,20 @@ class Gender(enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    #Register fields
+    # Register fields
     username = Column(String, unique=True)
     password = Column(String)
 
-    #User data fields
+    # User data fields
     full_name = Column(String)
     # sex = Column(Enum(Gender))
     sex = Column(Enum("male", "female", "other", name="Gender"), default="male")
     birth_date = Column(Date)
     address = Column(String)
 
-    #Status fields
+    # Status fields
     id = Column(Integer, primary_key=True, index=True)
 
-    #Relate fields
-    # phones = relationship("Phone", backref="user")
-    # emails = relationship("Email", backref="user")
+    # Relate fields
+    phones = relationship("Phone", backref="user")
+    emails = relationship("Email", backref="user")

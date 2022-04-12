@@ -4,7 +4,6 @@ from db.database import Base
 from sqlalchemy.orm import relationship
 
 
-
 class PhoneType(enum.Enum):
     MOBILE = "mobile"
     WORK = "work"
