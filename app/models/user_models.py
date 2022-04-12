@@ -26,7 +26,3 @@ class User(Base):
 
     # Status fields
     id = Column(Integer, primary_key=True, index=True)
-
-    # Relate fields
-    phones = relationship("Phone", backref="user")
-    emails = relationship("Email", backref="user")
