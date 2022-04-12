@@ -1,61 +1,32 @@
-from sqlalchemy import Column, String, Integer, Enum, Date, ForeignKey
+import enum
+from sqlalchemy import Column, String, Integer, Date, Enum
 from db.database import Base
 from sqlalchemy.orm import relationship
 
 
-class Gender(Enum):
+class Gender(enum.Enum):
     MALE = "male"
     FEMALE = "female"
     OTHER = "other"
 
 
-class PhoneType(Enum):
-    MOBILE = "mobile"
-    WORK = "work"
-
-
-class EmailType(Enum):
-    PRIVATE = "private"
-    WORK = "work"
-
-
 class User(Base):
     __tablename__ = "users"
 
+    #Register fields
     username = Column(String, unique=True)
     password = Column(String)
+
+    #User data fields
     full_name = Column(String)
+    # sex = Column(Enum(Gender))
     sex = Column(Enum("male", "female", "other", name="Gender"), default="male")
     birth_date = Column(Date)
     address = Column(String)
 
-
     #Status fields
     id = Column(Integer, primary_key=True, index=True)
 
-    phone = relationship("Phone", backref="users")
-    email = relationship("Email", backref="users")
-
-
-class Phone(Base):
-    __tablename__ = "phones"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    user_id = Column(Integer, ForeignKey("users.id"))
-    type_of_phone = Column(Enum("mobile", "work", name=PhoneType), default="work")
-    number = Column(String, unique=True)
-
-    user = relationship("User", backref="phones")
-
-
-class Email(Base):
-    __tablename__ = "emails"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    user_id = Column(Integer, ForeignKey("users.id"))
-    type_of_email = Column(Enum("private", "work", name=EmailType), default="work")
-    email = Column(String, default=EmailType.WORK, unique=True)
-
-    user = relationship("User", backref="emails")
+    #Relate fields
+    # phones = relationship("Phone", backref="user")
+    # emails = relationship("Email", backref="user")

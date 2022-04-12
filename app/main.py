@@ -5,6 +5,11 @@ from endpoints.phone_endpoints import router as PhoneRouter
 from db.database import Base, engine
 
 
+
+
+
+
+
 def get_application() -> FastAPI:
     route = FastAPI()
     route.include_router(UserRouter, tags=["User"], prefix="/user")
@@ -12,11 +17,15 @@ def get_application() -> FastAPI:
     route.include_router(EmailRouter, tags=["Email"], prefix="/email")
     return route
 
-
 app = get_application()
 
+@app.on_event("startup")
+async def startup_event():
+    async with engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
-Base.metadata.create_all(bind=engine)
+
 
 
 # For debugging

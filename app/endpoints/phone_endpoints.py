@@ -1,35 +1,36 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from db.database import get_db
-from schemas.user_schema import Phone, PhoneCreate, PhoneUpdate
-from crud.phone import create_phone_user, delete_phone_by_id, get_phone_by_id, update_phone_user
+from crud.phone import PhoneCrud
+from db.database import DbSession
+from schemas.phone_schema import Phone, PhoneCreate, PhoneUpdate
 
 
 router = APIRouter()
 
 
-
 @router.get("/{phone_id}", tags=['Phone'], response_model=Phone)
-async def get_user_phone(phone_id: int, db: Session = Depends(get_db)):
-    phone = await get_phone_by_id(db, phone_id=phone_id)
-    return phone
+async def get_user_phone(phone_id: int, db: PhoneCrud = Depends()):
+    async with DbSession() as db:
+        db_phone = await PhoneCrud.get_phone_by_id(db=db, phone_id=phone_id)
+    return db_phone
 
 
-@router.post("/", tags=['Phone'], response_model=Phone)
-async def create_phone_for_user(user_id: int, phone: PhoneCreate, db: Session = Depends(get_db)):
-    return create_phone_user(db=db, phone=phone, user_id=user_id)
+@router.post("/{user_id}", tags=['Phone'], response_model=Phone)
+async def create_phone_for_user(user_id: int, phone: PhoneCreate, phone_crud: PhoneCrud = Depends()):
+    async with DbSession() as db:
+        return await phone_crud.create_phone_user(db=db, phone=phone, user_id=user_id)
 
 
-@router.patch("/{phone_id}", tags=["Phone"], response_model=Phone)
-async def update_phone_for_user(phone_id: int, phone: PhoneUpdate, db: Session = Depends(get_db)):
-    update_phone = await update_phone_user(db, phone, phone_id)
-    return update_phone
+@router.patch("/{phone_id}", tags=['Phone'], response_model=Phone)
+async def update_phone_for_user(phone_id: int, phone: PhoneUpdate, phone_crud: PhoneCrud = Depends()):
+    async with DbSession() as db:
+        update_phone = await phone_crud.update_phone_user(db, phone, phone_id)
+        return update_phone
 
 
 @router.delete("/{phone_id}", tags=["Phone"], response_model=str)
-async def delete_phone_by_(phone_id: int, db: Session = Depends(get_db)):
-    db_user = await delete_phone_by_id(db, phone_id=phone_id)
-    if db_user:
-        delete_phone_by_id(db, phone_id)
+async def delete_phone_by_(phone_id: int, phone_crud: PhoneCrud = Depends()):
+    async with DbSession() as db:
+        result = await phone_crud.delete_phone_by_id(db=db, phone_id=phone_id)
+    if result:
         return f"Phone successfully deleted"
-    raise HTTPException(status_code=400, detail="User not found")
+    raise HTTPException(status_code=400, detail="Phone not found")

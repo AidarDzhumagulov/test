@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from crud.user import Auth as us
+from crud.user import UserCrud
+from db.database import DbSession
 from schemas.user_schema import UserCreate, UserUpdate, UserBase
 
 
@@ -12,43 +13,32 @@ def healthcheck():
 
 
 @router.get("/{username}", tags=['User'], response_model=UserBase)
-async def get_user(username: str, auth: us = Depends()):
-    db_user = await auth.get_user_by_username(username=username)
+async def get_user(username: str, user_crud: UserCrud = Depends()):
+    async with DbSession() as db:
+        db_user = await user_crud.get_user_by_username(username=username, db=db)
     return db_user
 
 
-# @router.post("/", response_model=user_schema.UserBase, status_code=201)
-# async def create_user(user: user_schema.UserBase, auth: us = Depends()):
-#     db_user = await auth.get_user_by_id(id=user.id)
-#     if db_user:
-#         raise HTTPException(status_code=400, detail="Email already registered")
-#     return auth.create_user(user=user)
-
-
 @router.post("/", response_model=UserBase, status_code=201)
-async def create_user(user: UserCreate, auth: us = Depends()):
-    db_user = await auth.get_user_by_username(username=user.username)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
-    return auth.create_user(user=user)
+async def create_user(user: UserCreate, user_crud: UserCrud = Depends()):
+    async with DbSession() as db:
+        db_user = await user_crud.get_user_by_username(username=user.username, db=db)
+        if db_user:
+            raise HTTPException(status_code=400, detail="Username already registered")
+        return await user_crud.create_user(user=user, db=db)
 
 
 @router.patch("/{username}", response_model=UserUpdate)
-async def update_user_by_username(username: str, req: UserUpdate, auth: us = Depends()):
-    update_user = await auth.update_user_by_username(req, username)
+async def update_user_by_username(username: str, req: UserUpdate, user_crud: UserCrud = Depends()):
+    async with DbSession() as db:
+        update_user = await user_crud.update_user_by_username(req, username, db)
     return update_user
 
 
-# @router.patch("/{user_id}", response_model=UserUpdate)
-# async def update_user_by_id(user_id: int, req: UserUpdate, auth: us = Depends()):
-#     update_user = await auth.update_user_by_id(req, user_id)
-#     return update_user
-
-
 @router.delete("/{username}", tags=['User'], status_code=200, response_model=str)
-async def delete_user(username: str, auth: us = Depends()):
-    db_user = await auth.delete_user_by_username(username)
-    if db_user:
-        auth.delete_user_by_username(username)
-        return f"User successfully deleted"
+async def delete_user(username: str, user_crud: UserCrud = Depends()):
+    async with DbSession() as db:
+        result = await user_crud.delete_user_by_username(username, db=db)
+        if result:
+            return f"User successfully deleted"
     raise HTTPException(status_code=400, detail="User not found")
