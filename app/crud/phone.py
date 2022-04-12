@@ -4,12 +4,15 @@ from models import phone_models
 from schemas.phone_schema import PhoneCreate, PhoneUpdate
 
 class PhoneCrud:
+    """User's Phone CRUD"""
+    # To get user's phone by id from DB
     async def get_phone_by_id(self, db: AsyncSession, phone_id: int):
         stmt = select(phone_models.Phone).filter(phone_models.Phone.id == phone_id)
         result = await db.execute(stmt)
 
         return result.scalar()
 
+    # To create user's phone into DB
     async def create_phone_user(self, db: AsyncSession, phone: PhoneCreate, user_id: int):
         phone = phone_models.Phone(type_of_phone=phone.type_of_phone, number=phone.number, user_id=user_id)
         db.add(phone)
@@ -17,6 +20,7 @@ class PhoneCrud:
         await db.refresh(phone)
         return phone
 
+    # To update user's phone by user_id in DB
     async def update_phone_user(self, db: AsyncSession, phone: PhoneUpdate, phone_id: int):
         stmt = select(phone_models.Phone).filter(phone_models.Phone.id == phone_id)
         result = await db.execute(stmt)
@@ -33,6 +37,7 @@ class PhoneCrud:
         await db.commit()
         return db_phone
 
+    # To delete user's phone by id from DB
     async def delete_phone_by_id(self, db: AsyncSession, phone_id: int):
         stmt = select(phone_models.Phone).filter(phone_models.Phone.id == phone_id)
         result = await db.execute(stmt)

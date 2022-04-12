@@ -18,24 +18,21 @@ class UserCrud:
     def verify_password(cls, plain_password: str, hashed_password: str):
         return pwd_context.verify(plain_password, hashed_password)
 
+    # To get user by id from DB
     async def get_user_by_id(self, user_id: int, db: AsyncSession):
         stmt = select(user_models.User).filter(user_models.User.id == user_id)
         result = await db.execute(stmt)
 
         return result.scalar()
 
+    # To get user by username from DB
     async def get_user_by_username(self, username: str, db: AsyncSession):
         stmt = select(user_models.User).filter(user_models.User.username == username)
         result = await db.execute(stmt)
 
         return result.scalar()
 
-    async def get_user_by_email(self, email: str, db: AsyncSession):
-        stmt = select(user_models.User).filter(user_models.User.email == email)
-        result = await db.execute(stmt)
-
-        return result.scalar()
-
+    # To create user by username and password into DB
     async def create_user(self, user: UserCreate, db: AsyncSession):
         hashed_password = self.get_password_hash(user.password)
         user = user_models.User(username=user.username, password=hashed_password)
@@ -44,6 +41,7 @@ class UserCrud:
         await db.refresh(user)
         return user
 
+    # To update user by username in DB
     async def update_user_by_username(self, user: UserUpdate, username: str, db: AsyncSession):
         stmt = select(user_models.User).filter(user_models.User.username == username)
         result = await db.execute(stmt)
@@ -62,6 +60,7 @@ class UserCrud:
         await db.commit()
         return db_user
 
+    # To delete user by username from DB
     async def delete_user_by_username(self, username: str, db: AsyncSession):
         stmt = select(user_models.User).filter(user_models.User.username == username)
         result = await db.execute(stmt)

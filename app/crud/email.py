@@ -5,12 +5,15 @@ from schemas.email_schema import EmailCreate, EmailUpdate
 
 
 class EmailCrud:
+    """User's emails CRUD"""
+    # To get user's email by id
     async def get_email_by_id(self, db: AsyncSession, email_id: int):
         stmt = select(email_models.Email).filter(email_models.Email.id == email_id)
         result = await db.execute(stmt)
 
         return result.scalar()
 
+    # To create user's email by user_id
     async def create_email_user(self, db: AsyncSession, email: EmailCreate, user_id: int):
         email = email_models.Email(email=email.email, type_of_email=email.type_of_email, user_id=user_id)
         db.add(email)
@@ -18,6 +21,7 @@ class EmailCrud:
         await db.refresh(email)
         return email
 
+    # To update user's email by id
     async def update_email_by_id(self, db: AsyncSession, email: EmailUpdate, email_id: int):
         stmt = select(email_models.Email).filter(email_models.Email.id == email_id)
         result = await db.execute(stmt)
@@ -34,6 +38,7 @@ class EmailCrud:
         await db.commit()
         return db_email
 
+    # To delete user's email by id
     async def delete_email_by_id(self, db: AsyncSession, email_id: int):
         stmt = select(email_models.Email).filter(email_models.Email.id == email_id)
         result = await db.execute(stmt)

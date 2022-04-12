@@ -25,6 +25,7 @@ maker = sessionmaker(
 Base = declarative_base()
 
 class DbSession:
+    """Create an async connection to DB with AsyncSession"""
     def __init__(self) -> None:
         self.__session_instance: AsyncSession = None
 
