@@ -1,3 +1,4 @@
+from logger import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from passlib.context import CryptContext
@@ -39,6 +40,7 @@ class UserCrud:
         db.add(user)
         await db.commit()
         await db.refresh(user)
+        logger.info(f"User id = {user.id} successfully created, username = {user.username}")
         return user
 
     # To update user by username in DB
@@ -46,18 +48,24 @@ class UserCrud:
         stmt = select(user_models.User).filter(user_models.User.username == username)
         result = await db.execute(stmt)
         db_user = result.scalar()
+        logString = f'User id = {db_user.id} updated, '
 
         if user.full_name:
+            logString += f'full_name (old = {db_user.full_name}, new = {user.full_name}), '
             db_user.full_name = user.full_name
         if user.sex:
+            logString += f"sex (old = {db_user.sex}, new = {user.sex}) "
             db_user.sex = user.sex
         if user.birth_date:
+            logString += f"birth_date (old = {db_user.birth_date}, new = {user.birth_date}) "
             db_user.birth_date = user.birth_date
         if user.address:
+            logString += f"address (old = {db_user.address}, new = {user.address})"
             db_user.address = user.address
 
         db.add(db_user)
         await db.commit()
+        logger.info(logString)
         return db_user
 
     # To delete user by username from DB
@@ -69,5 +77,6 @@ class UserCrud:
         if db_user:
             await db.delete(db_user)
             await db.commit()
+            logger.info(f"User = {username} successfully deleted!")
             return True
         return False
